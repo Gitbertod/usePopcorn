@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 const tempMovieData = [
   {
@@ -47,20 +47,9 @@ const tempWatchedData = [
   },
 ];
 
-const KEY = "b601379";
-
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData);
   const [watched, setWatched] = useState(tempWatchedData);
-
-  useEffect(()=>{
-    fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=terminator`)
-    .then((res) => res.json())
-    .then((data) => setMovies(data.Search));
-  },[])
-
-  
-
   return (
     <>
       <Navbar>
@@ -123,7 +112,10 @@ function Box({ children }) {
   const [isOpen, setIsOpen] = useState(true);
   return (
     <div className="box">
-      <button className="btn-toggle" onClick={() => setIsOpen((open) => !open)}>
+      <button
+        className="btn-toggle"
+        onClick={() => setIsOpen((open) => !open)}
+      >
         {isOpen ? "–" : "+"}
       </button>
       {isOpen && children}

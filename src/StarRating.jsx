@@ -54,6 +54,7 @@ function Star({ onRate, full, onHoverIn, onHoverOut, color, size }) {
     display: "block",
     cursor: "pointer",
   };
+
   return (
     <span
       role="button"
