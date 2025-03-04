@@ -1,29 +1,5 @@
 import { useState, useEffect } from "react";
 
-const tempMovieData = [
-  {
-    imdbID: "tt1375666",
-    Title: "Inception",
-    Year: "2010",
-    Poster:
-      "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg",
-  },
-  {
-    imdbID: "tt0133093",
-    Title: "The Matrix",
-    Year: "1999",
-    Poster:
-      "https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg",
-  },
-  {
-    imdbID: "tt6751668",
-    Title: "Parasite",
-    Year: "2019",
-    Poster:
-      "https://m.media-amazon.com/images/M/MV5BYWZjMjk3ZTItODQ2ZC00NTY5LWE0ZDYtZTI3MjcwN2Q5NTVkXkEyXkFqcGdeQXVyODk4OTc3MTY@._V1_SX300.jpg",
-  },
-];
-
 const tempWatchedData = [
   {
     imdbID: "tt1375666",
@@ -50,41 +26,64 @@ const tempWatchedData = [
 const KEY = "b601379";
 
 export default function App() {
+  const [query, setQuery] = useState("");
+  const [error, setError] = useState("");
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
   const [isLoading, setIsloading] = useState(false);
-  const [error, setError] = useState("");
-  const query = "Robocop";
+  const tempQuery = "Robocop";
 
-  useEffect(function () {
-    async function fetchMoivies() {
-      try {
-        setIsloading(true);
-        const res = await fetch(
-          `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
-        );
-        const data = await res.json();
-
-        if (!res.ok)
-          throw new Error("Something went wrong with fetching movies");
-        if (data.Response === "False") throw new Error("Movie not found");
-
-        setMovies(data.Search);
-      } catch (err) {
-        setIsloading(false);
-        setError(err.message);
-      } finally {
-        setIsloading(false);
-      }
-    }
-    fetchMoivies();
+  useEffect(() => {
+    console.log("After initial render");
   }, []);
+
+  // useEffect(() => {
+  //   console.log("After every render");
+  // });
+
+  useEffect(() => {
+    console.log("Query");
+  }, [query]);
+
+  useEffect(
+    function () {
+      async function fetchMoivies() {
+        try {
+          setIsloading(true);
+          setError("");
+          const res = await fetch(
+            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
+          );
+          const data = await res.json();
+
+          if (!res.ok)
+            throw new Error("Something went wrong with fetching movies");
+          if (data.Response === "False") throw new Error("Movie not found");
+
+          setMovies(data.Search);
+        } catch (err) {
+          setIsloading(false);
+          setError(err.message);
+        } finally {
+          setIsloading(false);
+        }
+
+        if (query.length < 3) {
+          setMovies([]);
+          setError("");
+          return;
+        }
+      }
+      fetchMoivies();
+    },
+    [query]
+  );
 
   return (
     <>
       <Navbar>
         <Logo></Logo>
-        <Search></Search>
+        <Search query={query} setQuery={setQuery}></Search>
         <NumResults movies={movies}></NumResults>
       </Navbar>
       <Main>
@@ -137,8 +136,7 @@ function NumResults({ movies }) {
   );
 }
 
-function Search() {
-  const [query, setQuery] = useState("");
+function Search({ query, setQuery }) {
   return (
     <input
       className="search"
