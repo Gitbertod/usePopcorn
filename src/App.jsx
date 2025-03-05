@@ -34,7 +34,7 @@ export default function App() {
   const [selectedId, setSelectedId] = useState("NTT DATA");
 
   function handleSelectMovie(id) {
-    setSelectedId((selectedId)=> (id === selectedId ? null : id));
+    setSelectedId((selectedId) => (id === selectedId ? null : id));
   }
 
   function handleCloseMovie() {
@@ -170,11 +170,60 @@ function Box({ children }) {
   );
 }
 function MovieDetails({ selectedId, onCloseMovie }) {
+  const [movie, setMovie] = useState({});
+
+  const {
+    Title: title,
+    Year: year,
+    Poster: poster,
+    Runtime: runtime,
+    imdbRating,
+    Plot: plot,
+    Released: released,
+    Actors: actors,
+    Director: director,
+    Genre: genre,
+  } = movie;
+
+  console.log(title, year);
+
+  useEffect(() => {
+    async function getMovieDetails() {
+      const res = await fetch(
+        `http://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`
+      );
+      const data = await res.json();
+      setMovie(data);
+      console.log(data);
+    }
+    getMovieDetails();
+  }, []);
+
   return (
     <div className="details">
-      <button className="btn-back" onClick={onCloseMovie}>
-        &larr;
-      </button>
+      <header>
+        <button className="btn-back" onClick={onCloseMovie}>
+          &larr;
+        </button>
+        <img src={poster} />
+
+        <div className="details-overview">
+          <h2>{title}</h2>
+          <p>{released} &bull;</p>
+          <p>{genre}</p>
+          <p>
+            <span>⭐</span>
+            {imdbRating} IMDb rating
+          </p>
+        </div>
+      </header>
+      <section>
+        <p>
+          <em>{plot}</em>
+        </p>
+        <p>Starring {actors}</p>
+        <p>Directed by {director}</p>
+      </section>
       {selectedId}
     </div>
   );
