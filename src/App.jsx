@@ -1,37 +1,16 @@
 import { useState, useEffect } from "react";
+import StarRating from "./StarRating";
 
-const tempWatchedData = [
-  {
-    imdbID: "tt1375666",
-    Title: "Inception",
-    Year: "2010",
-    Poster:
-      "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg",
-    runtime: 148,
-    imdbRating: 8.8,
-    userRating: 10,
-  },
-  {
-    imdbID: "tt0088763",
-    Title: "Back to the Future",
-    Year: "1985",
-    Poster:
-      "https://m.media-amazon.com/images/M/MV5BZmU0M2Y1OGUtZjIxNi00ZjBkLTg1MjgtOWIyNThiZWIwYjRiXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg",
-    runtime: 116,
-    imdbRating: 8.5,
-    userRating: 9,
-  },
-];
 
 const KEY = "b601379";
 
 export default function App() {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState("inception");
   const [error, setError] = useState("");
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
   const [isLoading, setIsloading] = useState(false);
-  const [selectedId, setSelectedId] = useState("NTT DATA");
+  const [selectedId, setSelectedId] = useState(null);
 
   function handleSelectMovie(id) {
     setSelectedId((selectedId) => (id === selectedId ? null : id));
@@ -185,19 +164,18 @@ function MovieDetails({ selectedId, onCloseMovie }) {
     Genre: genre,
   } = movie;
 
-  console.log(title, year);
-
+  console.log(title,year)
   useEffect(() => {
     async function getMovieDetails() {
       const res = await fetch(
         `http://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`
       );
       const data = await res.json();
-      setMovie(data);
-      console.log(data);
+      console.log(data)
+      setMovie(data);  
     }
     getMovieDetails();
-  }, []);
+  }, [selectedId]);
 
   return (
     <div className="details">
@@ -205,11 +183,11 @@ function MovieDetails({ selectedId, onCloseMovie }) {
         <button className="btn-back" onClick={onCloseMovie}>
           &larr;
         </button>
-        <img src={poster} />
+        <img src={poster} alt={`Poster of the ${movie} movie`}/>
 
         <div className="details-overview">
           <h2>{title}</h2>
-          <p>{released} &bull;</p>
+          <p>{released} &bull;{runtime}</p>
           <p>{genre}</p>
           <p>
             <span>⭐</span>
@@ -218,6 +196,10 @@ function MovieDetails({ selectedId, onCloseMovie }) {
         </div>
       </header>
       <section>
+        <div className="rating">
+        <StarRating maxRating={10} size={24}/>
+
+        </div>
         <p>
           <em>{plot}</em>
         </p>
